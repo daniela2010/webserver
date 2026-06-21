@@ -1,0 +1,67 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Web Server - Home</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">NetworkProject Server</div>
+        <ul class="nav-links">
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/about/about.html">About</a></li>
+            <li><a href="/about/team.html">Team</a></li>
+            <li><a href="/private/data.html">Private Data</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h1>Custom Multi-Threaded Web Server</h1>
+        <p>
+            A high-performance HTTP server built entirely from scratch
+            for our Computer Networks course.
+        </p>
+
+        <a class="button" href="/about/about.html">
+            Explore Project Specifications
+        </a>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <h2>Core Server Architecture</h2>
+
+            <p>
+                Our custom-built web server is capable of handling
+                incoming TCP socket requests directly at the Transport Layer.
+                By reading byte streams from client requests, parsing HTTP
+                headers, and validating requested resources, it processes
+                web traffic efficiently.
+            </p>
+
+            <p>
+                This project focuses on understanding how real web servers
+                operate internally by implementing sockets, HTTP request
+                parsing, resource resolution, MIME type detection, and
+                multi-threaded client handling from scratch.
+            </p>
+
+            <p>
+                <strong>Supported Content Types:</strong>
+                text/html, text/css, image/jpeg, image/png
+            </p>
+
+            <br>
+
+            <a class="button" href="/about/team.html">
+                See Team Responsibilities
+            </a>
+        </section>
+
+        <section class="image-card">
+            <img src="/images/server.png" alt="Server Room">
+        </section>
+    </main>
+</body>
+</html>
