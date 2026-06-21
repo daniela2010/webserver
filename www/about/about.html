@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About the Project - Specifications</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">NetworkProject Server</div>
+        <ul class="nav-links">
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/about/about.html">About</a></li>
+            <li><a href="/about/team.html">Team</a></li>
+            <li><a href="/private/data.html">Private Data</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <section class="card">
+            <h1>Technical Specifications & Features</h1>
+
+            <p>
+                Instead of deploying our site on pre-built enterprise software like
+                Apache or Nginx, we manually implemented our own engine to handle
+                client-server paradigms natively.
+            </p>
+
+            <h2>Implemented Server Mechanisms</h2>
+
+            <ul>
+                <li>
+                    <strong>Socket Management:</strong>
+                    Opens a strict ServerSocket listening to incoming ports
+                    (e.g., Port 8080 or Port 80).
+                </li>
+
+                <li>
+                    <strong>MIME-Type Resolution:</strong>
+                    Evaluates request sub-strings to correctly bind header
+                    attributes such as
+                    <code>Content-Type: text/css</code>.
+                </li>
+
+                <li>
+                    <strong>Security Sanitization:</strong>
+                    Inspects relative paths to intercept
+                    <code>../</code>
+                    malicious attempts, actively deflecting Directory Traversal breaches.
+                </li>
+
+                <li>
+                    <strong>Stateless State Tracking:</strong>
+                    Employs structured layouts ready for expansion towards HTTP Cookies
+                    and user session parameters.
+                </li>
+            </ul>
+
+            <h2>HTTP Response Validation</h2>
+
+            <p>
+                The backend checks whether resource structures match host directives,
+                delivering robust
+                <code>200 OK</code>
+                payloads, or generating programmatic
+                <code>404 Not Found</code>
+                and
+                <code>403 Forbidden</code>
+                errors gracefully.
+            </p>
+        </section>
+
+        <section class="image-card">
+            <img src="/images/network.png" alt="Computer Network">
+        </section>
+    </main>
+</body>
+</html>

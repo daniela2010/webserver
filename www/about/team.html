@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Responsibilities</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">NetworkProject Server</div>
+        <ul class="nav-links">
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/about/about.html">About</a></li>
+            <li><a href="/about/team.html">Team</a></li>
+            <li><a href="/private/data.html">Private Data</a></li>
+        </ul>
+    </nav>
+
+    <main class="container wide">
+        <section class="card">
+            <h1>Project Division & Milestones</h1>
+
+            <p>
+                Our development lifecycle was engineered in parallel modules,
+                ensuring high separation of concerns across the network and
+                application-level components.
+            </p>
+
+            <div class="grid">
+                <div class="mini-card">
+                    <h3>Part A: Socket Operations</h3>
+                    <p>
+                        Handles the initial TCP connection workflow,
+                        server socket initialization, incoming connection
+                        acceptance, and multi-threaded client handling.
+                    </p>
+                </div>
+
+                <div class="mini-card">
+                    <h3>Part B: HTTP Stream Parser</h3>
+                    <p>
+                        Parses incoming HTTP requests, extracts methods,
+                        requested URLs, and HTTP versions, then builds
+                        valid HTTP responses.
+                    </p>
+                </div>
+
+                <div class="mini-card">
+                    <h3>Part C: Resource & Security Manager</h3>
+                    <p>
+                        Resolves static resources, validates requested paths,
+                        detects MIME types, prevents directory traversal
+                        attacks, and enforces access restrictions.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
