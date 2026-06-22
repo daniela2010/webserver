@@ -1,87 +1,90 @@
 import socket
 import threading
+import http_protocol
+import resources
 
 HOST = "127.0.0.1"
 PORT = 8080
 
 def read_request_headers(conn):
     """
-    Read from the socket until the end-of-headers marker (\r\n\r\n) is found,
-    then return the header block as text
+    Read bytes from the client socket until the HTTP header terminator
+    (\r\n\r\n) is found, then return only the header section as text.
     """
-    # Collect raw bytes here
     buffer = b""
     while True:
-        # Read whatever has arrived
         data = conn.recv(4096)
-        # If client disconnected, break
+
+        # Stop reading if the client closes the connection.
         if not data:
             break
-        # Append what we just read
         buffer += data
-        # If full header block arrived
+        # HTTP headers end with an empty line: \r\n\r\n.
         if b"\r\n\r\n" in buffer:
             break
-        # Safety: 64 KB limit, if bigger break
+        # Limit the maximum header size to avoid reading unlimited data.
         if len(buffer) > 65536:
             break
-    # Return the header block as text
     return buffer.split(b"\r\n\r\n", 1)[0].decode("iso-8859-1")
 
 
 def handle_client(conn, addr):
     """
-    Handles ONE client connection, start to finish. Runs in its own thread,
-    so a slow client here can't block the main accept() loop.
+    Handle one client connection from request reading to response sending.
+    This function runs in a separate thread for each connected client.
     """
     try:
-        # Step 1: read the request off the socket (our robust reader above).
+        # Read the raw HTTP request and convert it into a structured Request object.
         request_text = read_request_headers(conn)
-        # debug: see exactly what the browser sent
-        print(request_text)
-        # Step 2 (TEMPORARY): a hardcoded response, just to prove the networking
-        # works on its own. Later this gets replaced by calls to the teammates'
-        # parse request and build response functions via the shared contracts.
-        body = b"<h1>Hello from my server!</h1>"
-        response = (
-            b"HTTP/1.0 200 OK\r\n"                                  # status line
-            b"Content-Type: text/html\r\n"                         # header
-            b"Content-Length: " + str(len(body)).encode() + b"\r\n"  # header (body size)
-            b"\r\n"                                                # blank line = end of headers
-        ) + body                                                   # the body itself
-        conn.sendall(response)         # send the full response back to the client
+        request = http_protocol.parse_request(request_text)
+
+        # Choose the response based on request validity, method, and requested resource.
+        if not request.ok:
+            # Malformed HTTP request.
+            response = http_protocol.build_response(
+                400, b"400 Bad Request", "text/plain"
+            )
+        elif request.method != "GET":
+            # This server only supports GET requests.
+            response = http_protocol.build_response(
+                405, b"405 Method Not Allowed", "text/plain"
+            )
+        else:
+            # Resolve the requested static file and format it as an HTTP response.
+            resource = resources.resolve_resource(request.path)
+            response = http_protocol.build_response(
+                resource.status, resource.body, resource.content_type
+            )
+
+        conn.sendall(response)
+
     finally:
-        # HTTP/1.0 is stateless: every request gets its own connection, then we
-        # close it. The 'finally' guarantees we close even if something errors.
+        # HTTP/1.0 does not require persistent connections in this project.
+        # Each request is handled independently, then the socket is closed.
         conn.close()
 
 
 def main():
-    # Sets up the listening socket once, then loops forever accepting clients.
-    # Create a TCP/IPv4 socket. AF_INET = IPv4, SOCK_STREAM = TCP (reliable, ordered).
+    """
+    Create the listening TCP socket and accept incoming client connections.
+    Each accepted connection is handled by a new thread.
+    """
+    # Create a TCP/IPv4 socket.
     server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    # Let us restart the server and reuse the port immediately, instead of waiting
-    # out the OS's TIME_WAIT period. Pure convenience while developing.
+    # Allow the port to be reused immediately after restarting the server.
     server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-    server_sock.bind((HOST, PORT))     # claim the port
-    server_sock.listen(5)              # start listening; queue up to 5 pending clients
+    # Bind the socket to the configured host and port, then start listening.
+    server_sock.bind((HOST, PORT))
+    server_sock.listen(5)
     print(f"Serving on http://{HOST}:{PORT}/  (press Ctrl+C to stop)")
 
     while True:
-        # accept() BLOCKS here until a client connects, then returns a brand-new
-        # socket (conn) dedicated to that client, plus their address (addr).
+        # Wait for the next client connection.
         conn, addr = server_sock.accept()
-
-        # Hand this client off to its own thread, so the main loop can go straight
-        # back to accept() for the next client. daemon=True lets the program exit
-        # cleanly even if threads are still running.
+        # Use a separate thread so one slow client does not block others.
         thread = threading.Thread(target=handle_client, args=(conn, addr), daemon=True)
         thread.start()
 
-
-# This runs main() only when the file is executed directly (python server.py),
-# not when it's imported by another file.
+# Start the server only when this file is executed directly.
 if __name__ == "__main__":
     main()

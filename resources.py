@@ -1,14 +1,14 @@
 import os
-
 from contracts import Resource
 
-# The only directory the server is allowed to serve files from.
-STATIC_ROOT = "www"
+# Build an absolute path to the static file directory.
+# This keeps the server working even if it is started from another folder.
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = os.path.join(BASE_DIR, "www")
 
-# Subdirectories a client is allowed to reach. for anything else, 403 Forbidden.
-# "" means the root directory itself.
+# Only these subdirectories are available to clients.
+# The empty string represents files directly inside www/.
 ALLOWED_SUBDIRS = {"", "about", "css", "images"}
-
 MIME_TYPES = {
     ".html": "text/html",
     ".css": "text/css",
@@ -19,68 +19,64 @@ MIME_TYPES = {
     ".gif": "image/gif",
 }
 
-
 def detect_mime(filename: str) -> str:
-    #Map a file extension to a Content-Type. Falls back to a generic binary type.
+    """Return the Content-Type value that matches the file extension."""
     _, ext = os.path.splitext(filename)
     return MIME_TYPES.get(ext.lower(), "application/octet-stream")
 
-# Return False if the request should be rejected for security reasons
 def is_safe(url_path: str) -> bool:
-    # Block directory traversal attempts.
+    """
+    Validate that the requested URL path stays inside the static root
+    and belongs to one of the allowed public directories.
+    """
+    # Reject directory traversal attempts.
     if ".." in url_path:
         return False
-
     # Remove the leading slash so we can inspect the first folder name.
     clean_path = url_path.lstrip("/")
-
     # Split the path into parts.
     parts = clean_path.split("/")
-
-    # If the file is directly under www, there is no subfolder.
+    # Files directly inside www/ have no subdirectory name.
     if len(parts) == 1:
-        first_subdir = ""
+        if os.path.isdir(os.path.join(STATIC_ROOT, parts[0])):
+            first_subdir = parts[0]
+        else:
+            first_subdir = ""
     else:
         first_subdir = parts[0]
 
-    # Allow only approved subdirectories.
     if first_subdir not in ALLOWED_SUBDIRS:
         return False
-
     # Build the full filesystem path.
     full_path = os.path.join(STATIC_ROOT, clean_path)
 
-    # Resolve both paths to their real absolute paths.
+    # Resolve real paths before comparing them to protect the static root.
     static_root_real = os.path.realpath(STATIC_ROOT)
     full_path_real = os.path.realpath(full_path)
-
     return (
-    full_path_real == static_root_real
-    or
-    full_path_real.startswith(
-        static_root_real + os.sep
-    ) )
+        full_path_real == static_root_real
+        or full_path_real.startswith(static_root_real + os.sep)
+    )
 
 
 def resolve_resource(url_path: str) -> Resource:
-    # Check whether the requested URL path is allowed.
+    """
+    Convert a valid URL path into a Resource object containing the response
+    status code, response body, and Content-Type.
+    """
     if not is_safe(url_path):
         return Resource(
             status=403,
             body=b"403 Forbidden",
             content_type="text/plain"
         )
-
     # Map the root URL to the default homepage.
     if url_path == "/":
         url_path = "/index.html"
 
     # Remove the leading slash to create a relative file path.
     clean_path = url_path.lstrip("/")
-
-    # Build the full path inside the static root directory.
     file_path = os.path.join(STATIC_ROOT, clean_path)
-
     # Return 404 if the requested file does not exist.
     if not os.path.isfile(file_path):
         return Resource(
@@ -99,5 +95,3 @@ def resolve_resource(url_path: str) -> Resource:
         body=body,
         content_type=detect_mime(file_path)
     )
-
-
