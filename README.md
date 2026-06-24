@@ -39,23 +39,25 @@ Blocked locations:
 - Any other subdirectory that is not explicitly allowed
 
 ## Project Structure
+```text
 webserver/
-├── server.py
-├── http_protocol.py
-├── resources.py
-├── contracts.py
-└── www/
-    ├── index.html
-    ├── about/
-    │   ├── about.html
-    │   └── team.html
-    ├── css/
-    │   └── style.css
-    ├── images/
-    │   ├── network.png
-    │   └── server.png
-    └── private/
-        └── data.html
+|-- server.py
+|-- http_protocol.py
+|-- resources.py
+|-- contracts.py
+`-- www/
+    |-- index.html
+    |-- about/
+    |   |-- about.html
+    |   `-- team.html
+    |-- css/
+    |   `-- style.css
+    |-- images/
+    |   |-- network.png
+    |   `-- server.png
+    `-- private/
+        `-- data.html
+```
 
 ## File Responsibilities
 ### `server.py`
@@ -80,84 +82,89 @@ python server.py
 ```
 
 The server will start on:
-```
+```text
 http://127.0.0.1:8080/
 ```
+
 To stop the server, press `Ctrl+C` in the terminal.
 
 ## Browser Testing
 After starting the server, open a browser and visit:
-```
+```text
 http://127.0.0.1:8080/
 ```
+
 or:
-```
+```text
 http://127.0.0.1:8080/index.html
 ```
+
 The page should load together with its CSS and images.
 
 ## cURL Testing
 The following commands can be used to verify the server behavior.
+On Windows PowerShell, use `curl.exe` instead of `curl`, because `curl` may run PowerShell's `Invoke-WebRequest` alias.
 
 ### Successful Request
-```
-curl -v http://127.0.0.1:8080/index.html
+```bash
+curl.exe -v http://127.0.0.1:8080/index.html
 ```
 
 Expected result:
-```
+```text
 HTTP/1.0 200 OK
 ```
 
 ### CSS File
-```
-curl -v http://127.0.0.1:8080/css/style.css
+```bash
+curl.exe -v http://127.0.0.1:8080/css/style.css
 ```
 
 Expected result:
-```
+```text
 HTTP/1.0 200 OK
 Content-Type: text/css
 ```
 
 ### Missing File
-```
-curl -v http://127.0.0.1:8080/missing.html
+```bash
+curl.exe -v http://127.0.0.1:8080/missing.html
 ```
 
 Expected result:
-```
+```text
 HTTP/1.0 404 Not Found
 ```
 
 ### Forbidden Directory
-```
-curl -v http://127.0.0.1:8080/private/data.html
+```bash
+curl.exe -v http://127.0.0.1:8080/private/data.html
 ```
 
 Expected result:
-```
+```text
 HTTP/1.0 403 Forbidden
 ```
 
 ### Directory Traversal Attempt
-```
-curl -v http://127.0.0.1:8080/../server.py
+```bash
+curl.exe --path-as-is -v http://127.0.0.1:8080/../server.py
 ```
 
 Expected result:
-```
+```text
 HTTP/1.0 403 Forbidden
 ```
 
 ### Unsupported Method
-```
-curl -v -X POST http://127.0.0.1:8080/index.html
+```bash
+curl.exe -v -X POST http://127.0.0.1:8080/index.html
 ```
 
 Expected result:
-```
+```text
 HTTP/1.0 405 Method Not Allowed
+Allow: GET
 ```
 
 ## HTTP Status Codes
