@@ -166,6 +166,15 @@ Expected result:
 HTTP/1.0 405 Method Not Allowed
 Allow: GET
 ```
+### Malformed Request (400)
+curl cannot send a malformed HTTP request, so use this Python one-liner instead:
+```powershell
+python -c "import socket; s=socket.socket(); s.connect(('127.0.0.1',8080)); s.send(b'NOT VALID\r\n\r\n'); print(s.recv(1024).decode()); s.close()"
+```
+Expected result:
+```
+HTTP/1.0 400 Bad Request
+```
 
 ## HTTP Status Codes
 The server supports the following status codes:
