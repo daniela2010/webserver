@@ -1,8 +1,10 @@
 # Multi-Threaded Web Server
 ## Submitted By
 Daniela Roitman  (ID 209788272)
+
 Shani Hasid (ID 324042431)
-Yamit Barkan (ID 325106441
+
+Yamit Barkan (ID 325106441)
 
 ## Project Overview
 This project implements a simple multi-threaded HTTP/1.0 web server from scratch using low-level TCP sockets in Python.
