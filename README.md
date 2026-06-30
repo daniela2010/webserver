@@ -190,3 +190,6 @@ The server supports the following status codes:
 - The implementation is intended for educational purposes and local testing.
 - The default host is `127.0.0.1`.
 - The default port is `8080`.
+
+## Video
+- Link to the demo video: https://drive.google.com/file/d/10qffRrQMt3XZXdREMG1RixRVrI8OSze5/view?usp=sharing
